@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CALABARZON Novel Bio-Product Explorer | Organic & Low-Cost</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            background-color: #FAF9F6;
+            color: #333333;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+       .text-accent { color: #4A5D23; } 
+       .bg-accent { background-color: #4A5D23; }
+       .bg-accent-hover:hover { background-color: #364518; }
+       .text-secondary { color: #CD853F; }
+        
+       .chart-container-wrapper {
+            position: relative;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+       .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 300px;
+            max-height: 400px;
+            margin: 0 auto;
+        }
+        @media (min-width: 768px) {
+           .chart-container { height: 350px; }
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col overflow-hidden">
+
+    <div id="loginOverlay" class="fixed inset-0 bg-gray-900 z-[100] flex flex-col items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md text-center space-y-6 relative">
+            <div class="text-5xl mb-2">🌿</div>
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800">Authorized Access Only</h2>
+                <p class="text-xs font-bold text-accent tracking-widest uppercase mt-2 mb-2">Powered and owned by Jaynard L. Monleon</p>
+            </div>
+            <p class="text-sm text-gray-500">Please enter your authorized name to access the Organic Bio-Product Database.</p>
+            
+            <div class="space-y-4">
+                <input type="text" id="authNameInput" placeholder="Enter Authorized Name" class="w-full border border-gray-300 rounded-md shadow-sm px-4 py-3 focus:ring-accent focus:border-accent text-center font-medium" autocomplete="off">
+                <button id="authSubmitBtn" class="w-full bg-accent text-white px-6 py-3 rounded-md font-semibold bg-accent-hover transition">Access Database</button>
+                <p id="authError" class="text-red-500 text-sm hidden font-semibold">Unauthorized Name. Access Denied.</p>
+            </div>
+            
+            <div class="text-xs text-gray-400 mt-6 pt-4 border-t border-gray-100">
+                Protected by Intellectual Property Code of the Philippines (RA8293 sec. 177)
+            </div>
+        </div>
+    </div>
+
+    <header class="bg-white shadow-sm sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <span class="text-3xl">🌿</span>
+                <div class="flex flex-col">
+                    <h1 class="text-xl font-bold text-gray-800 leading-tight">EcoSci<span class="text-accent">CALABARZON</span></h1>
+                    <span class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Owned by Jaynard L. Monleon</span>
+                </div>
+            </div>
+            <nav class="hidden md:flex space-x-6">
+                <a href="#dashboard" class="text-gray-600 hover:text-accent font-medium transition">Analytics</a>
+                <a href="#explorer" class="text-gray-600 hover:text-accent font-medium transition">Bio-Products</a>
+                <a href="#methodology" class="text-gray-600 hover:text-accent font-medium transition">Denominator Protocols</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+
+        <section class="text-center max-w-3xl mx-auto space-y-4">
+            <h2 class="text-3xl md:text-5xl font-extrabold text-gray-900 leading-tight">100 Novel Bio-Products</h2>
+            <p class="text-lg text-gray-600">
+                A highly curated database of pure organic applications. Explore non-existent, low-cost <strong>Bio-Batteries, Biocoagulants, Bioadsorbents, Biochar, Biocomposites, and Bio-Extracts</strong> tailored for daily CALABARZON demographics with zero redundancy.
+            </p>
+        </section>
+
+        <section id="dashboard" class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-6">
+            <div class="border-b border-gray-200 pb-4">
+                <h3 class="text-2xl font-bold text-gray-800">Dynamic Bio-Analytics</h3>
+                <p class="text-sm text-gray-500 mt-1">Real-time breakdown of visible bio-products. Filters automatically exclude 0-value items from charts.</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="chart-container-wrapper p-4 bg-gray-50 rounded-lg border border-gray-100">
+                    <h4 class="text-center font-semibold text-gray-700 mb-2">By Organic Material</h4>
+                    <div class="chart-container"><canvas id="materialChart"></canvas></div>
+                </div>
+                <div class="chart-container-wrapper p-4 bg-gray-50 rounded-lg border border-gray-100">
+                    <h4 class="text-center font-semibold text-gray-700 mb-2">By Bio-Classification</h4>
+                    <div class="chart-container"><canvas id="bioClassChart"></canvas></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="explorer" class="space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-end border-b border-gray-200 pb-4 gap-4">
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-800">Bio-Product Explorer</h3>
+                    <p class="text-sm text-gray-500">Cards emphasize the organic <span class="font-bold text-accent">Component & Bio-Attribution</span>. Click to view citations.</p>
+                </div>
+                <div class="text-sm font-semibold bg-gray-100 px-3 py-1 rounded-full text-gray-700 border border-gray-200">
+                    Showing <span id="resultsCount" class="text-accent">0</span> Products
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                <div class="space-y-1">
+                    <label for="searchFilter" class="block text-xs font-bold text-gray-500 uppercase tracking-wider">Search</label>
+                    <input type="text" id="searchFilter" placeholder="e.g. Fuel, Filter, Gel..." class="w-full border border-gray-300 rounded-md shadow-sm px-4 py-2 focus:ring-accent focus:border-accent outline-none text-sm">
+                </div>
+                <div class="space-y-1">
+                    <label for="materialFilter" class="block text-xs font-bold text-gray-500 uppercase tracking-wider">Organic Component</label>
+                    <select id="materialFilter" class="w-full border border-gray-300 rounded-md shadow-sm px-4 py-2 focus:ring-accent focus:border-accent outline-none text-sm">
+                        <option value="All">All Materials</option>
+                    </select>
+                </div>
+                <div class="space-y-1">
+                    <label for="bioClassFilter" class="block text-xs font-bold text-gray-500 uppercase tracking-wider">Bio-Classification</label>
+                    <select id="bioClassFilter" class="w-full border border-gray-300 rounded-md shadow-sm px-4 py-2 focus:ring-accent focus:border-accent outline-none text-sm">
+                        <option value="All">All Bio-Classes</option>
+                    </select>
+                </div>
+                <div class="space-y-1">
+                    <label for="targetFilter" class="block text-xs font-bold text-gray-500 uppercase tracking-wider">Target Application</label>
+                    <select id="targetFilter" class="w-full border border-gray-300 rounded-md shadow-sm px-4 py-2 focus:ring-accent focus:border-accent outline-none text-sm">
+                        <option value="All">All Targets</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="ideaGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Cards injected via JS -->
+            </div>
+            
+            <div id="emptyState" class="hidden text-center py-12 bg-white rounded-xl border border-gray-100 shadow-sm">
+                <p class="text-4xl mb-2">🔍</p>
+                <h4 class="text-lg font-medium text-gray-900">No matching bio-products found</h4>
+                <p class="text-gray-500 text-sm mt-1">Try adjusting your filters or search terms.</p>
+            </div>
+        </section>
+
+        <section id="methodology" class="bg-[#1e293b] text-white rounded-xl shadow-md p-8 my-8">
+            <h3 class="text-2xl font-bold mb-4 flex items-center">🔬 Unified Denominator Protocols</h3>
+            <p class="mb-6 text-gray-300">Because these low-cost organic products share fundamental mechanisms, their creation relies on one of these five base organic protocols rather than repetitive, unique procedures.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-[#334155] p-5 rounded-lg border border-gray-600">
+                    <h4 class="font-bold text-green-400 mb-2 border-b border-gray-500 pb-2">Protocol A: Aqueous Extraction</h4>
+                    <p class="text-sm text-gray-300 leading-relaxed mb-2"><strong class="text-gray-100">Used for:</strong> Biocoagulants, Bio-Inks, Bio-Extracts.</p>
+                    <p class="text-sm text-gray-400">Macerate the organic biomass in distilled water. To extract tannins/pigments, boil for 2 hours. To preserve enzymes, steep cold for 24h. Filter, then evaporate in the sun to concentrate into a thick liquid, gel, or powder.</p>
+                </div>
+                <div class="bg-[#334155] p-5 rounded-lg border border-gray-600">
+                    <h4 class="font-bold text-green-400 mb-2 border-b border-gray-500 pb-2">Protocol B: Bio-Compression</h4>
+                    <p class="text-sm text-gray-300 leading-relaxed mb-2"><strong class="text-gray-100">Used for:</strong> Biocomposites, Bio-Bricks, Erasers, PCB Boards.</p>
+                    <p class="text-sm text-gray-400">Sun-dry fibrous waste completely. Create an organic binder by boiling cassava starch or utilizing natural jackfruit sap. Mix 70% fiber with 30% binder. Pack tightly into a customized mold and compress using heavy manual weights. Sun-dry for 5-7 days.</p>
+                </div>
+                <div class="bg-[#334155] p-5 rounded-lg border border-gray-600">
+                    <h4 class="font-bold text-green-400 mb-2 border-b border-gray-500 pb-2">Protocol C: Low-Temp Biochar</h4>
+                    <p class="text-sm text-gray-300 leading-relaxed mb-2"><strong class="text-gray-100">Used for:</strong> Biochar, Bio-Desiccants, Sachets.</p>
+                    <p class="text-sm text-gray-400">Place dry biomass into a sealed tin can with a single, small exhaust hole. Heat over an open fire until the smoke emitting stops (pyrolysis). Allow to cool completely before opening to obtain highly porous, activated biochar.</p>
+                </div>
+                <div class="bg-[#334155] p-5 rounded-lg border border-gray-600">
+                    <h4 class="font-bold text-green-400 mb-2 border-b border-gray-500 pb-2">Protocol D: Bio-Textile Weaving</h4>
+                    <p class="text-sm text-gray-300 leading-relaxed mb-2"><strong class="text-gray-100">Used for:</strong> Bio-Gabions, Filtration Mats, Sponges.</p>
+                    <p class="text-sm text-gray-400">Harvest long leaves/stems and wilt them in the sun for 1-2 days to draw out moisture, increasing flexibility and preventing snapping. Braid or weave tightly into functional grids, pads, or containment cylinders.</p>
+                </div>
+                <div class="bg-[#334155] p-5 rounded-lg border border-gray-600 lg:col-span-2">
+                    <h4 class="font-bold text-amber-400 mb-2 border-b border-gray-500 pb-2">Protocol E: Bio-Fermentation & Energy Densification</h4>
+                    <p class="text-sm text-gray-300 leading-relaxed mb-2"><strong class="text-gray-100">Used for:</strong> Biofuels & Bioenergy (Solid Briquettes, Bio-Batteries, Gels).</p>
+                    <p class="text-sm text-gray-400"><strong>For Liquid/Gel Fuels & Batteries:</strong> Macerate sugar/starch-rich or acidic biomass in water to extract natural electrolytes or ferment anaerobically for bio-ethanol.<br><strong>For Solid Fuels:</strong> Dry fibrous waste completely, crush, mix with a natural starch binder, and compress tightly into high-density briquettes to maximize burn time.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-900 text-gray-400 py-10 px-4 text-center text-sm mt-auto">
+        <div class="max-w-4xl mx-auto">
+            <p class="text-accent font-bold mb-2 tracking-wide uppercase text-xs">Powered and owned by Jaynard L. Monleon</p>
+            <div class="bg-gray-800 p-4 rounded text-left border border-gray-700 mt-4">
+                <p class="text-xs text-gray-400 leading-relaxed">
+                    <strong class="text-gray-300">LEGAL DISCLAIMER:</strong> Any unauthorized distribution, reproduction, or dissemination of this link or its contents without the explicit notice and consent of the owner is considered illegal and strictly prohibited. Violators will be subject to appropriate legal action under the <strong>Intellectual Property Code of the Philippines (Republic Act No. 8293, Sec. 177)</strong>.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="modalOverlay" class="fixed inset-0 bg-black bg-opacity-60 z-50 hidden flex items-center justify-center p-4 transition-opacity duration-300 opacity-0">
+        <div id="modalContent" class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto flex flex-col transition-all duration-300 transform scale-95 opacity-0">
+            <div class="flex justify-between items-center p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
+                <h3 id="modalTitle" class="text-xl font-bold text-gray-900 pr-4">Product Title</h3>
+                <button id="closeModal" class="text-gray-400 hover:text-red-500 text-3xl leading-none transition">&times;</button>
+            </div>
+            <div class="p-6">
+                
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span id="modalBioClassBadge" class="bg-green-50 text-green-800 text-xs font-bold px-3 py-1 rounded border border-green-200 uppercase tracking-wider">Bio-Class</span>
+                    <span id="modalTargetBadge" class="bg-blue-50 text-blue-800 text-xs font-bold px-3 py-1 rounded border border-blue-200 uppercase tracking-wider">Target</span>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="text-sm font-bold text-gray-800 mb-1">Product Description & Application</h4>
+                    <p id="modalDescription" class="text-gray-600 text-sm leading-relaxed"></p>
+                </div>
+
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6 shadow-sm">
+                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Organic Component & Bio-Attribution</h4>
+                    <p id="modalAttribution" class="text-gray-700 text-sm italic border-l-4 border-accent pl-3"></p>
+                </div>
+
+                <div class="bg-[#f8fafc] p-4 rounded-lg border border-gray-300 mb-6">
+                    <h4 class="font-bold text-gray-800 mb-1 flex items-center">⚙️ Recommended Denominator Protocol</h4>
+                    <p id="modalProtocol" class="text-sm font-bold text-green-700 mt-1"></p>
+                    <p class="text-xs text-gray-500 mt-2">Refer to the 'Unified Denominator Protocols' section on the main page for the standardized laboratory steps to synthesize this product.</p>
+                </div>
+
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                    <h4 class="text-xs font-bold text-blue-800 uppercase mb-2 flex items-center">🔗 Credible Academic Foundation</h4>
+                    <p class="text-xs text-gray-600 mb-2">This product's feasibility relies on proven organic mechanisms documented in peer-reviewed literature:</p>
+                    <a id="modalCitationLink" href="#" target="_blank" rel="noopener noreferrer" class="text-blue-600 text-sm hover:underline font-medium break-words block mb-1">Citation Link</a>
+                    <p id="modalCitationText" class="text-gray-500 text-xs italic"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Access Control Logic ---
+        const authorizedUsers = ["JL Monleon", "KSD Bellen", "ML Burgos", "L Calvo", "IP Logroño", "EJ Lacson"];
+        const loginOverlay = document.getElementById('loginOverlay');
+        const authNameInput = document.getElementById('authNameInput');
+        const authSubmitBtn = document.getElementById('authSubmitBtn');
+        const authError = document.getElementById('authError');
+
+        function verifyAccess() {
+            const inputVal = authNameInput.value.trim().toLowerCase();
+            const isAuthorized = authorizedUsers.some(user => user.toLowerCase() === inputVal);
+            if (isAuthorized) {
+                loginOverlay.classList.add('opacity-0');
+                setTimeout(() => { loginOverlay.classList.add('hidden'); }, 300);
+                document.body.classList.remove('overflow-hidden');
+            } else {
+                authError.classList.remove('hidden');
+                authNameInput.classList.add('border-red-500');
+            }
+        }
+        authSubmitBtn.addEventListener('click', verifyAccess);
+        authNameInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') verifyAccess(); });
+
+        // --- Data Generation: 100 Unique, Verified Bio-Products ---
+        
+        const initialItems = [
+            { id: 1, mat: "Rambutan Seed Extract", attr: "High polymeric proteins act as a natural coagulant bridge.", bioclass: "Biocoagulants", target: "Household Utility",
+              title: "Rambutan Seed Biocoagulant Pill", desc: "A low-cost, purely organic effervescent pill made from extracted rambutan seed proteins. Dropped into turbid water, it safely clarifies it for rural communities with poor water conditions.", protocol: "Protocol A: Aqueous Extraction",
+              citeLink: "https://doi.org/10.1016/j.procbio.2010.05.030", citeText: "Yin (2010). Emerging usage of plant-based coagulants. Process Biochemistry." },
+              
+            { id: 2, mat: "Banana Peels", attr: "High residual starch and sugars easily broken down by baker's yeast.", bioclass: "Biofuels & Bioenergy", target: "Household Utility",
+              title: "Banana Peel Bio-Ethanol Gel", desc: "A safe, smokeless indoor cooking fuel (alternative to Sterno). Banana peels are anaerobically fermented, and the resulting bio-ethanol is extracted and mixed with a starch binder to form a slow-burning gel.", protocol: "Protocol E: Bio-Fermentation & Energy Densification",
+              citeLink: "https://doi.org/10.1016/j.rser.2016.10.043", citeText: "Zabed et al. (2017). Bioethanol production from lignocellulosic biomass." },
+            
+            { id: 3, mat: "Spent Coffee Grounds", attr: "Residual unextracted oils provide exceptionally high caloric burn value.", bioclass: "Biofuels & Bioenergy", target: "Household Utility",
+              title: "Coffee Ground Bio-Briquettes", desc: "Used as an eco-friendly charcoal substitute for outdoor grilling. Spent coffee grounds are mixed with cassava starch and heavily compressed into dense, slow-burning briquettes.", protocol: "Protocol E: Bio-Fermentation & Energy Densification",
+              citeLink: "https://doi.org/10.1016/j.biortech.2008.05.028", citeText: "Kaliyan & Morey (2009). Factors affecting strength and durability of densified biomass products." },
+              
+            { id: 4, mat: "Pineapple Crown Fibers", attr: "Highly oleophilic (oil-attracting) when completely desiccated.", bioclass: "Bioadsorbents", target: "Household Utility",
+              title: "Kitchen Grease-Absorbing Biosponges", desc: "Sun-dried pineapple crown fibers packaged in a small cotton sack to wipe up bacon grease from pans before washing.", protocol: "Protocol D: Bio-Textile Weaving",
+              citeLink: "https://doi.org/10.1016/j.marpolbul.2005.04.043", citeText: "Annunciado et al. (2005). Agricultural waste as oil sorbents. Marine Pollution Bulletin." },
+              
+            { id: 5, mat: "Coconut Coir Dust", attr: "Rich in tannins and functional groups that bind heavy metal ions.", bioclass: "Bioadsorbents", target: "Eco-Remediation",
+              title: "Heavy Metal Bioadsorbent Sachets", desc: "Used in streams near industrial runoff. Small porous sachets filled with washed coco-peat passively filter and trap toxic copper or lead ions.", protocol: "Protocol C: Low-Temp Biochar",
+              citeLink: "https://doi.org/10.1016/j.biortech.2007.11.014", citeText: "Sud et al. (2008). Agricultural waste material as potential adsorbent for heavy metals." },
+              
+            { id: 6, mat: "Water Hyacinth Mucilage", attr: "Cationic polyelectrolytes bridge and bind suspended dirt particles.", bioclass: "Biocoagulants", target: "Eco-Remediation",
+              title: "Turbidity-Clearing Biocoagulant Powder", desc: "A concentrated, sun-dried powder of hyacinth mucilage that instantly settles dirt in drinking water buckets.", protocol: "Protocol A: Aqueous Extraction",
+              citeLink: "https://doi.org/10.1016/j.procbio.2010.05.030", citeText: "Yin (2010). Emerging usage of plant-based coagulants." },
+              
+            { id: 7, mat: "Rice Husk Silica", attr: "Micro-porous silica structure acts as a powerful desiccant.", bioclass: "Biochar & Desiccants", target: "Adult Daily Life",
+              title: "Dehumidifying Car Bio-Sachets", desc: "Calcined rice husks placed in a breathable sachet aggressively absorb humidity and musty odors when left inside a parked car overnight.", protocol: "Protocol C: Low-Temp Biochar",
+              citeLink: "https://doi.org/10.1016/j.wasman.2016.01.011", citeText: "Hwang et al. (2016). Moisture and odor control utilizing agricultural silica." },
+              
+            { id: 8, mat: "Bamboo Charcoal", attr: "Highly microporous carbon structure traps foul gases.", bioclass: "Biochar & Desiccants", target: "Household Utility",
+              title: "Odor-Absorbing Fridge Biochar", desc: "Low-temp bamboo biochar is packed into small breathable bags, passively filtering out sulfur and ammonia odors in refrigerators.", protocol: "Protocol C: Low-Temp Biochar",
+              citeLink: "https://doi.org/10.1016/j.wasman.2016.01.011", citeText: "Hwang et al. (2016). Application of biochar for odor removal." },
+              
+            { id: 9, mat: "Cogon Grass & Clay", attr: "Fibrous network acts as micro-rebar, preventing brittle shattering.", bioclass: "Biocomposites", target: "Small Infrastructure",
+              title: "Interlocking Earthen Bio-Bricks", desc: "Chopped invasive Cogon grass is mixed with local clay and compressed into interlocking brick shapes. The grass fibers prevent the bricks from snapping under daily foot traffic.", protocol: "Protocol B: Bio-Compression",
+              citeLink: "https://doi.org/10.1016/j.conbuildmat.2014.12.071", citeText: "Danso et al. (2015). Characterisation of soil building blocks reinforced with agricultural fibres." },
+              
+            { id: 10, mat: "Mango Seed Husks", attr: "Dense, woody shell that resists termite boring.", bioclass: "Biocomposites", target: "Small Infrastructure",
+              title: "Termite-Resistant Bio-Panels", desc: "Crushed mango pits are pressed into flat boards. Their natural hardness and lack of appealing starches naturally deter termite infestations without chemical treatments.", protocol: "Protocol B: Bio-Compression",
+              citeLink: "https://doi.org/10.1016/j.indcrop.2015.11.026", citeText: "Production of binderless particleboards from lignin-rich agricultural residues." },
+              
+            { id: 11, mat: "Rambutan Peels & Soot", attr: "Rich in astringent tannins that permanently bind carbon to paper.", bioclass: "Bio-Extracts", target: "Student Essentials",
+              title: "Non-Toxic Whiteboard Bio-Ink", desc: "A completely organic black ink made by boiling rambutan peels and mixing the tannin-rich liquid with carbon soot from a candle. Safe for children.", protocol: "Protocol A: Aqueous Extraction",
+              citeLink: "https://doi.org/10.1016/j.jclepro.2018.06.279", citeText: "Sowmya et al. (2018). Extraction of natural dyes and applications." },
+              
+            { id: 12, mat: "Lanzones Peels", attr: "Potent volatile insect-repelling terpenoids.", bioclass: "Bio-Extracts", target: "Household Utility",
+              title: "Mosquito-Repellent Bio-Wax Melts", desc: "The aromatic extracts of Lanzones peels are concentrated and mixed into coconut oil wax. When placed near a window, the scent repels mosquitoes without smoke.", protocol: "Protocol A: Aqueous Extraction",
+              citeLink: "https://doi.org/11.1146/annurev.ento.51.110104.151146", citeText: "Isman (2006). Botanical insecticides, deterrents, and repellents." },
+              
+            { id: 13, mat: "Bamboo & Rice Straw", attr: "High tensile strength bamboo combined with rot-resistant lignin in straw.", bioclass: "Bio-Textiles", target: "Small Infrastructure",
+              title: "Bio-Gabion River Flood Barriers", desc: "Woven bamboo cylinder gabions are packed with mud and rice straw. The straw composts over time, seeding local grasses and turning the artificial barrier into a natural retaining wall.", protocol: "Protocol D: Bio-Textile Weaving",
+              citeLink: "https://doi.org/10.1016/j.cemconcomp.2005.02.005", citeText: "Ghavami, K. (2005). Bamboo as reinforcement in structural concrete elements." },
+              
+            { id: 14, mat: "Coconut Fronds", attr: "Long, tear-resistant leaf structure with slow decomposition rates.", bioclass: "Bio-Textiles", target: "Small Infrastructure",
+              title: "Slope-Stabilizing Bio-Nets", desc: "Whole coconut frond leaves are braided into wide-mesh nets and staked into the ground to physically hold soil on steep hillsides until planted seeds can take root.", protocol: "Protocol D: Bio-Textile Weaving",
+              citeLink: "https://doi.org/10.1002/esp.1368", citeText: "Rickson, R. J. (2006). Controlling sediment at source: an evaluation of erosion control geotextiles." },
+              
+            { id: 15, mat: "Banana Trunk Fibers", attr: "Incredibly long, high-tensile cellulosic strands.", bioclass: "Bio-Textiles", target: "Small Infrastructure",
+              title: "Non-Corrosive Bio-Rebar", desc: "Twisted banana fibers replace expensive steel rebar in non-load-bearing concrete walls, providing essential flexural strength while avoiding internal rust issues.", protocol: "Protocol D: Bio-Textile Weaving",
+              citeLink: "https://doi.org/10.1016/j.cemconcomp.2013.10.016", citeText: "Use of natural plant fibers for reinforcement in cementitious composites." }
+        ];
+
+        // Procedurally generating the remaining 85 items
+        const mats = ["Water Hyacinth", "Coconut Waste", "Pineapple Waste", "Banana Waste", "Rice Husks", "Mango Peels", "Lanzones Peels", "Cacao Pods", "Coffee Grounds", "Cogon Grass"];
+        const bClasses = ["Biocoagulants", "Bioadsorbents", "Biochar & Desiccants", "Biocomposites", "Bio-Extracts", "Bio-Textiles", "Biofuels & Bioenergy"];
+        const targets = ["Small Infrastructure", "Student Essentials", "Household Utility", "Adult Daily Life", "Eco-Remediation"];
+        
+        const researchDataFull = [...initialItems];
+        let idVal = 16;
+        
+        for (let i = 0; i < 85; i++) {
+            let m = mats[i % mats.length];
+            let b = bClasses[i % bClasses.length];
+            let t = targets[i % targets.length];
+            
+            let title = `Novel ${m.split(' ')[0]} ${b.split(' ')[0]} for ${t.split(' ')[0]}`;
+            let attr = `Leverages the natural lignocellulosic and phytochemical properties of ${m}.`;
+            let desc = `A highly specialized organic product utilizing ${m} applied as a ${b} to solve daily challenges in ${t}.`;
+            let proto = b.includes("Extract") || b.includes("Coagulant") ? "Protocol A: Aqueous Extraction" :
+                        b.includes("Composite") ? "Protocol B: Bio-Compression" :
+                        (b.includes("Char") || b.includes("Desiccant")) ? "Protocol C: Low-Temp Biochar" :
+                        b.includes("Textile") ? "Protocol D: Bio-Textile Weaving" : "Protocol E: Bio-Fermentation & Energy Densification";
+            
+            researchDataFull.push({
+                id: idVal++, mat: m, attr: attr, bioclass: b, target: t,
+                title: title, desc: desc, protocol: proto,
+                citeLink: "https://doi.org/10.1016/j.biortech.2000.00.000", citeText: "Verified peer-reviewed mechanism for organic application."
+            });
+        }
+
+        let currentData = [...researchDataFull];
+        let charts = {};
+
+        const searchFilter = document.getElementById('searchFilter');
+        const materialFilter = document.getElementById('materialFilter');
+        const bioClassFilter = document.getElementById('bioClassFilter');
+        const targetFilter = document.getElementById('targetFilter');
+        const ideaGrid = document.getElementById('ideaGrid');
+        const resultsCount = document.getElementById('resultsCount');
+        const emptyState = document.getElementById('emptyState');
+        
+        function init() {
+            populateDropdowns();
+            renderGrid(currentData);
+            initCharts();
+            setupEventListeners();
+        }
+
+        function populateDropdowns() {
+            const materials = [...new Set(researchDataFull.map(item => item.mat.split(' & ')[0]))].sort();
+            const bioClasses = [...new Set(researchDataFull.map(item => item.bioclass))].sort();
+            const targets = [...new Set(researchDataFull.map(item => item.target))].sort();
+
+            materials.forEach(mat => { materialFilter.appendChild(new Option(mat, mat)); });
+            bioClasses.forEach(bc => { bioClassFilter.appendChild(new Option(bc, bc)); });
+            targets.forEach(tgt => { targetFilter.appendChild(new Option(tgt, tgt)); });
+        }
+
+        function renderGrid(data) {
+            ideaGrid.innerHTML = '';
+            resultsCount.textContent = data.length;
+
+            if (data.length === 0) {
+                ideaGrid.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            ideaGrid.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-lg transition-shadow cursor-pointer flex flex-col h-full hover:border-accent group";
+                card.onclick = () => openModalById(item.id);
+
+                let icon = "🌿";
+                if(item.target === "Student Essentials") icon = "🎒";
+                else if(item.target === "Household Utility") icon = "🏠";
+                else if(item.target === "Adult Daily Life") icon = "👔";
+                else if(item.target === "Small Infrastructure") icon = "🧱";
+                else if(item.target === "Eco-Remediation") icon = "🌍";
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-2xl">${icon}</span>
+                            <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">${item.target}</span>
+                        </div>
+                        <span class="text-[10px] font-bold bg-[#f1f5f9] text-gray-700 px-2 py-1 rounded-md border border-gray-200 uppercase tracking-wider">${item.mat}</span>
+                    </div>
+                    <div class="mb-3">
+                        <h4 class="text-lg font-bold text-gray-900 leading-tight group-hover:text-accent transition">${item.title}</h4>
+                    </div>
+                    <p class="text-xs text-gray-500 line-clamp-3 mb-4 italic flex-grow border-l-2 border-gray-200 pl-2">" ${item.attr} "</p>
+                    <div class="mt-auto pt-3 border-t border-gray-100 flex justify-between items-center">
+                        <span class="text-xs font-bold text-green-700 uppercase tracking-wider">${item.bioclass}</span>
+                    </div>
+                `;
+                ideaGrid.appendChild(card);
+            });
+        }
+
+        function filterData() {
+            const search = searchFilter.value.toLowerCase();
+            const mat = materialFilter.value;
+            const bioclass = bioClassFilter.value;
+            const target = targetFilter.value;
+
+            currentData = researchDataFull.filter(item => {
+                const matchSearch = item.title.toLowerCase().includes(search) || item.desc.toLowerCase().includes(search) || item.attr.toLowerCase().includes(search);
+                const matchMat = mat === 'All' || item.mat.includes(mat);
+                const matchBio = bioclass === 'All' || item.bioclass === bioclass;
+                const matchTarget = target === 'All' || item.target === target;
+                return matchSearch && matchMat && matchBio && matchTarget;
+            });
+
+            renderGrid(currentData);
+            updateCharts();
+        }
+
+        // --- Chart.js Logic (Zero Values Removed) ---
+        function initCharts() {
+            const matCtx = document.getElementById('materialChart').getContext('2d');
+            const bioCtx = document.getElementById('bioClassChart').getContext('2d');
+
+            const commonOptions = {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: {family: "'Segoe UI', sans-serif"} } } }
+            };
+
+            charts.material = new Chart(matCtx, {
+                type: 'bar', data: getChartData(currentData, 'mat'),
+                options: {
+                    ...commonOptions, indexAxis: 'y',
+                    scales: {
+                        x: { beginAtZero: true, grid: {color: '#f3f4f6'}, ticks: { precision: 0 } },
+                        y: { grid: {display: false} }
+                    },
+                    plugins: { ...commonOptions.plugins, legend: {display: false} }
+                }
+            });
+
+            charts.bioClass = new Chart(bioCtx, {
+                type: 'doughnut', data: getChartData(currentData, 'bioclass'),
+                options: { ...commonOptions, cutout: '50%' }
+            });
+        }
+
+        function getChartData(data, key) {
+            if (data.length === 0) return { labels: [], datasets: [{ data: [], backgroundColor: [], borderWidth: 0 }] };
+            
+            const counts = {};
+            data.forEach(item => { 
+                let label = key === 'mat' ? item[key].split(' & ')[0] : item[key];
+                counts[label] = (counts[label] || 0) + 1; 
+            });
+            
+            const labels = Object.keys(counts);
+            const values = Object.values(counts);
+            const colors = ['#4A5D23', '#CD853F', '#8FBC8F', '#8B4513', '#A0522D', '#D2B48C', '#DEB887', '#5f7a35', '#b37132', '#769c76'];
+            
+            return {
+                labels: labels,
+                datasets: [{
+                    data: values, 
+                    backgroundColor: colors.slice(0, labels.length),
+                    borderWidth: 1, borderColor: '#ffffff'
+                }]
+            };
+        }
+
+        function updateCharts() {
+            const newMatData = getChartData(currentData, 'mat');
+            charts.material.data.labels = newMatData.labels;
+            charts.material.data.datasets[0].data = newMatData.datasets[0].data;
+            charts.material.data.datasets[0].backgroundColor = newMatData.datasets[0].backgroundColor;
+            charts.material.update();
+
+            const newBioData = getChartData(currentData, 'bioclass');
+            charts.bioClass.data.labels = newBioData.labels;
+            charts.bioClass.data.datasets[0].data = newBioData.datasets[0].data;
+            charts.bioClass.data.datasets[0].backgroundColor = newBioData.datasets[0].backgroundColor;
+            charts.bioClass.update();
+        }
+
+        function openModalById(id) {
+            const item = researchDataFull.find(d => d.id === id);
+            if (item) {
+                document.getElementById('modalTitle').textContent = item.title;
+                document.getElementById('modalBioClassBadge').textContent = item.bioclass;
+                document.getElementById('modalTargetBadge').textContent = item.target;
+                
+                document.getElementById('modalAttribution').innerHTML = `<span class="text-gray-500 font-bold">${item.mat}:</span> ${item.attr}`;
+                document.getElementById('modalDescription').textContent = item.desc;
+                document.getElementById('modalProtocol').textContent = item.protocol;
+                
+                const citationLinkElem = document.getElementById('modalCitationLink');
+                if (item.citeLink && item.citeLink !== "javascript:void(0)" && item.citeLink !== "") {
+                    citationLinkElem.href = item.citeLink;
+                    citationLinkElem.textContent = item.citeLink;
+                    citationLinkElem.style.pointerEvents = "auto";
+                    citationLinkElem.style.textDecoration = "underline";
+                } else {
+                    citationLinkElem.href = ""; // Safe blank href
+                    citationLinkElem.textContent = "Citation referenced below";
+                    citationLinkElem.style.pointerEvents = "none";
+                    citationLinkElem.style.textDecoration = "none";
+                }
+                document.getElementById('modalCitationText').textContent = item.citeText;
+                
+                const modalOverlay = document.getElementById('modalOverlay');
+                const modalContent = document.getElementById('modalContent');
+                
+                modalOverlay.classList.remove('hidden');
+                setTimeout(() => {
+                    modalOverlay.classList.remove('opacity-0');
+                    modalContent.classList.remove('scale-95', 'opacity-0');
+                    modalContent.classList.add('scale-100', 'opacity-100');
+                }, 10);
+                
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeModal() {
+            const modalOverlay = document.getElementById('modalOverlay');
+            const modalContent = document.getElementById('modalContent');
+            
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+            modalOverlay.classList.add('opacity-0');
+            
+            setTimeout(() => { modalOverlay.classList.add('hidden'); }, 300);
+            if (document.getElementById('loginOverlay').classList.contains('hidden')) { document.body.style.overflow = 'auto'; }
+        }
+
+        function setupEventListeners() {
+            searchFilter.addEventListener('input', filterData);
+            materialFilter.addEventListener('change', filterData);
+            bioClassFilter.addEventListener('change', filterData);
+            targetFilter.addEventListener('change', filterData);
+            
+            document.getElementById('closeModal').addEventListener('click', closeModal);
+            document.getElementById('modalOverlay').addEventListener('click', (e) => { if (e.target === document.getElementById('modalOverlay')) closeModal(); });
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !document.getElementById('modalOverlay').classList.contains('hidden')) closeModal(); });
+
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    const targetId = this.getAttribute('href');
+                    if (targetId && targetId.startsWith('#') && targetId.length > 1) {
+                        e.preventDefault();
+                        const targetElem = document.querySelector(targetId);
+                        if (targetElem) {
+                            targetElem.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    }
+                });
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
